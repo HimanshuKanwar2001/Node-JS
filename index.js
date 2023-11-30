@@ -82,20 +82,22 @@ app.get("/practice", function (req, res) {
   });
 });
 
-app.post('.create-contact',function(req,res){
-  Contact.create({
-    name:req.body.name,
-    phone:req.body.name,
-  },function(err,newContact){
-    if(err){
+app.post(".create-contact", async function (req, res) {
+  try {
+    const create = await Contact.create({
+      name: req.body.name,
+      phone: req.body.name,
+    });
+
+    console.log("*********", create);
+    return res.redirect("back");
+  } catch (err) {
+    if (err) {
       console.log("error in  creating a contact!");
       return;
     }
-    console.log("*********",newContact)
-    return res.redirect('back')
   }
-  )
-})
+});
 
 // app.post("/create-contact", function (req, res) {
 //   // contactList.push({
@@ -108,33 +110,42 @@ app.post('.create-contact',function(req,res){
 // });
 
 //for deleting a contact
-app.get("/delete-contact", function (req, res) {
-  //get the query from the url
-  let phone = req.query.phone;
-  let index = contactList.findIndex((contact) => contact.phone == phone);
-  console.log(index);
-  if (index != -1) {
-    contactList.splice(index, 1);
+app.get("/delete-contact", async function (req, res) {
+  try {
+    //get the id from query in the url
+    let id = req.query.id;
+    console.log(id);
+    //find  the contact in the database using id and delete
+    await Contact.findByIdAndDelete(id);
+    return res.redirect("back");
+  } catch (err) {
+    console.log("error in deleting an boject from database");
+    return;
   }
-  return res.redirect("/");
+
+  // //get the query from the url
+  // let phone = req.query.phone;
+  // let index = contactList.findIndex((contact) => contact.phone == phone);
+  // console.log(index);
+  // if (index != -1) {
+  //   contactList.splice(index, 1);
+  // }
+  // return res.redirect("/");
 });
 
-
-app.post('/create-contact', async function (req, res) {
-    try {
-        const newContact = await Contact.create({
-            name: req.body.name,
-            phone: req.body.phone
-        });
-        console.log('Contact created:', newContact);
-        return res.redirect('back');
-    } catch (err) {
-        console.error('Error in creating a contact:', err);
-        return res.status(500).send('Internal Server Error');
-    }
+app.post("/create-contact", async function (req, res) {
+  try {
+    const newContact = await Contact.create({
+      name: req.body.name,
+      phone: req.body.phone,
+    });
+    console.log("Contact created:", newContact);
+    return res.redirect("back");
+  } catch (err) {
+    console.error("Error in creating a contact:", err);
+    return res.status(500).send("Internal Server Error");
+  }
 });
-
-
 
 // app.post("/create-contact", async function (req, res) {
 //   Contact.create({
@@ -149,15 +160,15 @@ app.post('/create-contact', async function (req, res) {
 //       console.log("error in creating a contact!");
 //       return;
 //     });
-  // function (err, newContact) {
-  //   if (err) {
-  //     console.log("error in creating a contact!");
-  //     return;
-  //   }
-  //   console.log("**********", newContact);
-  //   return res.redirect("back");
-  // }
-  // );
+// function (err, newContact) {
+//   if (err) {
+//     console.log("error in creating a contact!");
+//     return;
+//   }
+//   console.log("**********", newContact);
+//   return res.redirect("back");
+// }
+// );
 // });
 app.listen(port, function (err) {
   if (err) {
